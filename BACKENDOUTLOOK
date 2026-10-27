@@ -1,0 +1,31 @@
+# TASKNEST - BACKEND DEVELOPMENT OUTLOOK & PROGRESS TRACKER
+
+Xem chi tiết đầy đủ tại file markdown: [BACKENDOUTLOOK.md](BACKENDOUTLOOK.md)
+
+1. TỔNG QUAN KIẾN TRÚC & CÔNG NGHỆ:
+   - Microservices: config-server, discovery-server, api-gateway, identity-service, notification-service, work-service.
+   - Chuẩn DTO: Class thông thường kết hợp Lombok (@Getter, @Setter, @NoArgsConstructor, @AllArgsConstructor, @Builder). Không dùng record.
+   - Chuẩn Response: ApiDataResponse<T> gồm (success, message, data, errors, httpStatus).
+   - Múi giờ hệ thống: Asia/Ho_Chi_Minh.
+
+2. CÁC QUY TẮC ĐÃ TRIỂN KHAI VÀ HOÀN THÀNH:
+   - ACC-01: Đăng ký họ tên, email, mật khẩu, xác nhận mật khẩu.
+   - ACC-02: Họ tên bỏ khoảng trắng đầu/cuối, độ dài 2-100 ký tự.
+   - ACC-03: Email đúng định dạng RFC 5322, trim, lower-case, kiểm tra duy nhất.
+   - ACC-04: Mật khẩu >= 8 ký tự, khớp xác nhận, băm BCrypt, không trả về API.
+   - VERIFY-01: Tài khoản mới có is_email_verified = false, sinh token UUID ngẫu nhiên 24h.
+   - VERIFY-02: Tài khoản chưa xác nhận chỉ thực hiện verify, resend, logout.
+   - VERIFY-03: Token có hạn 24h, dùng 1 lần duy nhất (used_at). Khi resend thì revoke token cũ.
+   - VERIFY-04: Cooldown 60s giữa 2 lần gửi (trả về 429 kèm remainingSeconds), tối đa 5 lần/giờ.
+   - VERIFY-05: Gửi mail async/log, lỗi mail không rollback việc tạo user.
+
+3. DANH SÁCH ENDPOINTS HIỆN TẠI:
+   - POST /api/identity/register (hoặc /api/v1/auth/register)
+   - GET  /api/v1/auth/verify-email?token=...
+   - POST /api/v1/auth/resend-verification
+   - GET  /api/identity/status
+
+4. KIỂM THỬ:
+   - identity-service: 37/37 tests passed.
+   - api-gateway: 5/5 tests passed.
+   - Postman Collection: postman_collection_identity_verification.json.
